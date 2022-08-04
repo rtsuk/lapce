@@ -161,22 +161,34 @@ fn window_icon() -> Option<druid::Icon> {
 #[cfg(target_os = "macos")]
 fn macos_window_desc<T: druid::Data>(desc: WindowDesc<T>) -> WindowDesc<T> {
     desc.menu(|_, _, _| {
-        Menu::new("Lapce").entry(
-            Menu::new("")
-                .entry(MenuItem::new("About Lapce"))
-                .separator()
-                .entry(
-                    MenuItem::new("Hide Lapce")
-                        .command(druid::commands::HIDE_APPLICATION)
-                        .hotkey(SysMods::Cmd, "h"),
-                )
-                .separator()
-                .entry(
-                    MenuItem::new("Quit Lapce")
-                        .command(druid::commands::QUIT_APP)
-                        .hotkey(SysMods::Cmd, "q"),
+        Menu::new("Lapce")
+            .entry(
+                Menu::new("")
+                    .entry(MenuItem::new("About Lapce"))
+                    .separator()
+                    .entry(
+                        MenuItem::new("Hide Lapce")
+                            .command(druid::commands::HIDE_APPLICATION)
+                            .hotkey(SysMods::Cmd, "h"),
+                    )
+                    .separator()
+                    .entry(
+                        MenuItem::new("Quit Lapce")
+                            .command(druid::commands::QUIT_APP)
+                            .hotkey(SysMods::Cmd, "q"),
+                    ),
+            )
+            .entry(
+                Menu::new("File").entry(
+                    MenuItem::new(LocalizedString::new("file-menu-new"))
+                        .command(Command::new(
+                            LAPCE_UI_COMMAND,
+                            LapceUICommand::NewWindow(None),
+                            druid::Target::Global,
+                        ))
+                        .hotkey(SysMods::Cmd, "n"),
                 ),
-        )
+            )
     })
 }
 
@@ -238,12 +250,23 @@ impl AppDelegate<LapceData> for LapceAppDelegate {
         if let Some(LapceUICommand::NewWindow(from_window_id)) =
             cmd.get(LAPCE_UI_COMMAND)
         {
-            let (size, pos) = data
-                .windows
-                .get(from_window_id)
-                // If maximised, use default dimensions instead
-                .filter(|win| !win.maximised)
-                .map(|win| (win.size, win.pos + (50.0, 50.0)))
+            let first_window_id = data.windows.keys().last();
+            dbg!(&first_window_id);
+            dbg!(&from_window_id);
+            let (size, pos) = from_window_id
+                .as_ref()
+                .or(first_window_id)
+                .and_then(|from_window_id| {
+                    data.windows
+                        .get(from_window_id)
+                        // If maximised, use default dimensions instead
+                        .filter(|win| !win.maximised)
+                        .map(|win| {
+                            dbg!(&win.size);
+                            dbg!(&win.pos);
+                            (win.size, win.pos + (50.0, 50.0))
+                        })
+                })
                 .unwrap_or((Size::new(800.0, 600.0), Point::new(0.0, 0.0)));
             let info = WindowInfo {
                 size,

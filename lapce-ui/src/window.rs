@@ -417,6 +417,9 @@ impl Widget<LapceWindowData> for LapceWindow {
                         ctx.request_layout();
                         ctx.set_handled();
                     }
+                    LapceUICommand::NewWindow(window_id) => {
+                        dbg!(&window_id);
+                    }
                     _ => (),
                 }
             }

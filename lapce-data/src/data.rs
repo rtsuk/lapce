@@ -1226,7 +1226,7 @@ impl LapceTabData {
             LapceWorkbenchCommand::NewWindow => {
                 ctx.submit_command(Command::new(
                     LAPCE_UI_COMMAND,
-                    LapceUICommand::NewWindow(self.window_id),
+                    LapceUICommand::NewWindow(Some(self.window_id)),
                     Target::Global,
                 ));
             }

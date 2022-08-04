@@ -542,7 +542,7 @@ pub enum LapceUICommand {
     NextEditorTab,
     PreviousEditorTab,
     FilterItems,
-    NewWindow(WindowId),
+    NewWindow(Option<WindowId>),
     ReloadWindow,
     CloseBuffers(Vec<BufferId>),
     RequestPaintRect(Rect),
